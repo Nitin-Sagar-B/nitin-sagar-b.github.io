@@ -1,9 +1,9 @@
-const RELEASE = '6';
+const RELEASE = '7';
 const CACHE_PREFIX = 'abstractos-v';
 const CACHE_NAME = CACHE_PREFIX + RELEASE;
 const ASSETS = [
-    '/', '/index.html', '/assets/css/styles.css?v=' + RELEASE, '/assets/js/scripts.js?v=' + RELEASE,
-    '/assets/images/image.png', '/assets/images/icon-192.png', '/assets/images/icon-512.png', '/manifest.json',
+    '/', '/index.html', '/styles.css?v=' + RELEASE, '/scripts.js?v=' + RELEASE,
+    '/image.png', '/icon-192.png', '/icon-512.png', '/manifest.json', '/og-preview.png',
 ];
 const VERSIONED_ASSETS = new Set(ASSETS.filter(path => path.includes('?')));
 
