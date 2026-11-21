@@ -31,6 +31,7 @@ This repository hosts my personal portfolio — an immersive, **IDE-themed singl
   - [Education](#education)
   - [Languages](#languages)
   - [Interests](#interests)
+- [Repository layout](#repository-layout)
 - [Contact](#contact)
 - [License](#license)
 
@@ -190,6 +191,18 @@ Grade: A | Covered k-NN, SVM, regression, clustering, PCA, neural networks, and 
 | Web Surfing | Receiving Data |
 
 ---
+
+
+## Repository layout
+
+| Path | Purpose |
+| --- | --- |
+| `index.html` | Terminal interface and portfolio sections |
+| `assets/css/` | Terminal styling |
+| `assets/js/` | Terminal interactions and server log |
+| `assets/images/` | Favicon and app icons |
+| `manifest.json`, `sw.js` | App manifest and offline cache |
+| `og-preview.png` | Social preview at its public URL |
 
 ## Contact
 
