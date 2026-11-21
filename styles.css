@@ -1141,7 +1141,7 @@ body {
         font-size: 0.75rem;
     }
 
-    /* Certifications - clean stacked layout on mobile */
+    /* Certifications – clean stacked layout on mobile */
     .no-bullet li {
         display: flex;
         flex-direction: column;
@@ -1165,7 +1165,7 @@ body {
         margin-top: 2px;
     }
 
-    /* Contact - prevent URL overflow */
+    /* Contact – prevent URL overflow */
     .bullet-list a.cert-link {
         word-break: break-all;
         font-size: 0.85rem;

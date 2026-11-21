@@ -635,7 +635,7 @@ function initializeTerminal() {
                 miniLog.appendChild(document.createElement('br'));
                 miniLog.appendChild(document.createTextNode(logLine));
 
-                // Prune: keep max ~12 child nodes (6 lines x 2 nodes each)
+                // Prune: keep max ~12 child nodes (6 lines × 2 nodes each)
                 while (miniLog.childNodes.length > 12) {
                     miniLog.removeChild(miniLog.firstChild);
                 }

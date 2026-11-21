@@ -33,7 +33,7 @@ function project(item) {
 
 function record(item) {
     const heading = item.url ? link(item.url, item.title) : escape(item.title);
-    const organization = item.organization ? ` � ${escape(item.organization)}` : '';
+    const organization = item.organization ? ` · ${escape(item.organization)}` : '';
     const summary = item.summary ? `\n    <p>${escape(item.summary)}</p>` : '';
     return `<li class="portfolio-record">
     <strong>${heading}</strong>

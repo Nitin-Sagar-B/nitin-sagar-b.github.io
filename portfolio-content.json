@@ -32,7 +32,7 @@
     {
       "id": "ratio-core",
       "title": "RaTiO-CoRE",
-      "summary": "Explores collaborative reasoning with specialized language models. A Python orchestration layer assigns roles, manages shared context, and combines the models' responses.",
+      "summary": "Explores collaborative reasoning with specialized language models. A Python orchestration layer assigns roles, manages shared context, and combines the models’ responses.",
       "repo": "https://github.com/Nitin-Sagar-B/RaTiO-CoRE",
       "section": "research"
     },
@@ -49,26 +49,26 @@
     {
       "title": "Associate Software Engineer",
       "organization": "Accenture",
-      "date": "Oct 2025 - Present",
+      "date": "Oct 2025 – Present",
       "summary": "Backend engineer based in Hyderabad."
     },
     {
       "title": "Java Developer Intern",
       "organization": "Accenture",
-      "date": "Feb 2025 - Jun 2025",
+      "date": "Feb 2025 – Jun 2025",
       "summary": "Built Java and Spring Boot projects during the Java for ATCI Stream Nanodegree, then traced API implementations and walked through application flows with the team lead."
     },
     {
       "title": "Data Science Master Virtual Intern",
-      "organization": "Altair RapidMiner � AICTE-EduSkills",
-      "date": "Jul 2024 - Sep 2024",
+      "organization": "Altair RapidMiner · AICTE–EduSkills",
+      "date": "Jul 2024 – Sep 2024",
       "summary": "Completed a 10-week program with RapidMiner training and assessments in data applications, data engineering, and machine learning."
     },
     {
       "title": "Summer of AI Intern",
       "organization": "Swecha Telangana",
-      "date": "May 2024 - Jun 2024",
-      "summary": "Recorded local interviews and contributed speech data to Swecha's Telugu language collection effort."
+      "date": "May 2024 – Jun 2024",
+      "summary": "Recorded local interviews and contributed speech data to Swecha’s Telugu language collection effort."
     }
   ],
   "timeline": [
@@ -88,7 +88,7 @@
     {
       "datetime": "2026-03",
       "date": "Mar 2026",
-      "title": "Earned Accenture's Reinvention with Agentic AI badge",
+      "title": "Earned Accenture’s Reinvention with Agentic AI badge",
       "url": "https://www.credly.com/badges/8d116ab5-9403-45ac-895f-7fc654f9fc78"
     },
     {
@@ -151,12 +151,12 @@
     {
       "datetime": "2024-09",
       "date": "Sep 2024",
-      "title": "Completed the AICTE-EduSkills Data Science Master Virtual Internship"
+      "title": "Completed the AICTE–EduSkills Data Science Master Virtual Internship"
     },
     {
       "datetime": "2024-07",
       "date": "Jul 2024",
-      "title": "Started the AICTE-EduSkills Data Science Master Virtual Internship"
+      "title": "Started the AICTE–EduSkills Data Science Master Virtual Internship"
     },
     {
       "datetime": "2024-06",
