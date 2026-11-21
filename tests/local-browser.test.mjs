@@ -18,7 +18,7 @@ const candidates = [
 ];
 const browser = process.env.CHROME_PATH ?? candidates.find(path => existsSync(path));
 const run = promisify(execFile);
-const [html, css, script, content] = await Promise.all(['index.html', 'styles.css', 'scripts.js', 'portfolio-content.json']
+const [html, css, script, content] = await Promise.all(['index.html', 'assets/css/styles.css', 'assets/js/scripts.js', 'content/portfolio-content.json']
   .map(path => readFile(new URL(`../${path}`, import.meta.url), 'utf8')));
 const projectCount = JSON.parse(content).projects.length;
 
@@ -29,8 +29,8 @@ async function render(checks, { suffix = '', width = 1100, scripts = true, reduc
     const fixture = join(directory, 'index.html');
     const page = html
       .replace(/<link\b[^>]*(?:https:\/\/|rel="(?:icon|apple-touch-icon|manifest)")[^>]*>/g, '')
-      .replace(/<link\b[^>]*href="styles\.css\?[^"]+"[^>]*>/, () => '<style>' + css + '</style>')
-      .replace(/<script\b[^>]*src="scripts\.js\?[^"]+"[^>]*><\/script>/, () => scripts ? '<script>' + script + '</script>' : '')
+      .replace(/<link\b[^>]*href="assets\/css\/styles\.css\?[^"]+"[^>]*>/, () => '<style>' + css + '</style>')
+      .replace(/<script\b[^>]*src="assets\/js\/scripts\.js\?[^"]+"[^>]*><\/script>/, () => scripts ? '<script>' + script + '</script>' : '')
       .replace('</body>', () => `<script>
         window.addEventListener('load', () => {
           const check = (condition, message) => { if (!condition) throw new Error(message); };
