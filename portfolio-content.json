@@ -1,0 +1,281 @@
+{
+  "projects": [
+    {
+      "id": "receptionist",
+      "title": "The Receptionist",
+      "summary": "Routes developer prompts through local Ollama by default and lets users opt into cloud routing. Each reply shows the selected model, routing reason, latency, and estimated cloud cost. The benchmark compares three routing strategies across 100 synthetic prompts.",
+      "repo": "https://github.com/Sparkience-AI/receptionist",
+      "section": "featured"
+    },
+    {
+      "id": "spark-insights",
+      "title": "Spark Insights",
+      "summary": "Profiles CSV and Excel data, runs regression or classification against a user-selected target, and compares model scores with a simple baseline. Training-only preprocessing and portable HTML and JSON reports make results inspectable.",
+      "repo": "https://github.com/Sparkience-AI/spark-insights",
+      "section": "featured"
+    },
+    {
+      "id": "sparkdocs",
+      "title": "SparkDocs",
+      "summary": "Combines keyword and semantic retrieval with local reranking. Answers are grounded in selected evidence with citations that point to the original PDF page, Word paragraph, or PowerPoint slide.",
+      "repo": "https://github.com/Sparkience-AI/SparkDocs",
+      "section": "featured"
+    },
+    {
+      "id": "sparkfolio",
+      "title": "Sparkfolio",
+      "summary": "An open-source investing guide for readers in India. The browser readiness check and a local MCP server share one decision engine, so the same inputs produce the same results.",
+      "repo": "https://github.com/Sparkience-AI/sparkfolio",
+      "section": "featured",
+      "demo": "https://sparkience-ai.github.io/sparkfolio/"
+    },
+    {
+      "id": "ratio-core",
+      "title": "RaTiO-CoRE",
+      "summary": "Explores collaborative reasoning with specialized language models. A Python orchestration layer assigns roles, manages shared context, and combines the models’ responses.",
+      "repo": "https://github.com/Nitin-Sagar-B/RaTiO-CoRE",
+      "section": "research"
+    },
+    {
+      "id": "flowscope",
+      "title": "FlowScope",
+      "summary": "Compares ARIMA, SARIMA, ETS, and LSTM forecasts on uploaded time-series data and plots predictions against observed values and error metrics.",
+      "repo": "https://github.com/Nitin-Sagar-B/flowscope",
+      "section": "research",
+      "paper": "https://arxiv.org/abs/2411.10716"
+    }
+  ],
+  "experience": [
+    {
+      "title": "Associate Software Engineer",
+      "organization": "Accenture",
+      "date": "Oct 2025 – Present",
+      "summary": "Backend engineer based in Hyderabad."
+    },
+    {
+      "title": "Java Developer Intern",
+      "organization": "Accenture",
+      "date": "Feb 2025 – Jun 2025",
+      "summary": "Built Java and Spring Boot projects during the Java for ATCI Stream Nanodegree, then traced API implementations and walked through application flows with the team lead."
+    },
+    {
+      "title": "Data Science Master Virtual Intern",
+      "organization": "Altair RapidMiner · AICTE–EduSkills",
+      "date": "Jul 2024 – Sep 2024",
+      "summary": "Completed a 10-week program with RapidMiner training and assessments in data applications, data engineering, and machine learning."
+    },
+    {
+      "title": "Summer of AI Intern",
+      "organization": "Swecha Telangana",
+      "date": "May 2024 – Jun 2024",
+      "summary": "Recorded local interviews and contributed speech data to Swecha’s Telugu language collection effort."
+    }
+  ],
+  "timeline": [
+    {
+      "datetime": "2026-11",
+      "date": "Nov 2026",
+      "title": "Earned OpenAI Agents and Workflows and Applied AI Foundations credentials",
+      "url": "#credentials"
+    },
+    {
+      "datetime": "2026-11",
+      "date": "Nov 2026",
+      "title": "Added the local MCP interface to Sparkfolio",
+      "summary": "The guide and MCP server share the same readiness rules.",
+      "url": "https://github.com/Sparkience-AI/sparkfolio/commit/b0332e85796919eda88c030685155f4a81f5833b"
+    },
+    {
+      "datetime": "2026-03",
+      "date": "Mar 2026",
+      "title": "Earned Accenture’s Reinvention with Agentic AI badge",
+      "url": "https://www.credly.com/badges/8d116ab5-9403-45ac-895f-7fc654f9fc78"
+    },
+    {
+      "datetime": "2025-10",
+      "date": "Oct 2025",
+      "title": "Joined Accenture full time as an Associate Software Engineer"
+    },
+    {
+      "datetime": "2025-08",
+      "date": "Aug 2025",
+      "title": "Started The Receptionist",
+      "url": "https://github.com/Sparkience-AI/receptionist"
+    },
+    {
+      "datetime": "2025-08",
+      "date": "Aug 2025",
+      "title": "Started Spark Insights",
+      "url": "https://github.com/Sparkience-AI/spark-insights"
+    },
+    {
+      "datetime": "2025-07",
+      "date": "Jul 2025",
+      "title": "Completed the Hugging Face Agents Course",
+      "url": "https://huggingface.co/datasets/agents-course/final-certificates/resolve/main/certificates/nit-sparky/2025-07-12.png"
+    },
+    {
+      "datetime": "2025-06",
+      "date": "Jun 2025",
+      "title": "Graduated from BVRIT with a BTech in AI and Data Science",
+      "summary": "CGPA 8.52."
+    },
+    {
+      "datetime": "2025-06",
+      "date": "Jun 2025",
+      "title": "Completed the Accenture Java Developer Internship"
+    },
+    {
+      "datetime": "2025-03",
+      "date": "Mar 2025",
+      "title": "Completed work on the RaTiO-CoRE prototype",
+      "url": "https://github.com/Nitin-Sagar-B/RaTiO-CoRE"
+    },
+    {
+      "datetime": "2025-02",
+      "date": "Feb 2025",
+      "title": "Started the Accenture Java Developer Internship"
+    },
+    {
+      "datetime": "2024-11",
+      "date": "Nov 2024",
+      "title": "Posted the FlowScope preprint to arXiv",
+      "url": "https://arxiv.org/abs/2411.10716"
+    },
+    {
+      "datetime": "2024-11",
+      "date": "Nov 2024",
+      "title": "Established Sparkience AI as a home for open-source projects",
+      "url": "https://github.com/Sparkience-AI"
+    },
+    {
+      "datetime": "2024-09",
+      "date": "Sep 2024",
+      "title": "Completed the AICTE–EduSkills Data Science Master Virtual Internship"
+    },
+    {
+      "datetime": "2024-07",
+      "date": "Jul 2024",
+      "title": "Started the AICTE–EduSkills Data Science Master Virtual Internship"
+    },
+    {
+      "datetime": "2024-06",
+      "date": "Jun 2024",
+      "title": "Started SparkDocs",
+      "url": "https://github.com/Sparkience-AI/SparkDocs"
+    },
+    {
+      "datetime": "2024-06",
+      "date": "Jun 2024",
+      "title": "Completed the Swecha Summer of AI Internship"
+    },
+    {
+      "datetime": "2024-05",
+      "date": "May 2024",
+      "title": "Started the Swecha Summer of AI Internship"
+    },
+    {
+      "datetime": "2024-05",
+      "date": "May 2024",
+      "title": "Completed Foundations of Modern Machine Learning at IIIT Hyderabad",
+      "summary": "Grade A."
+    },
+    {
+      "datetime": "2023-08",
+      "date": "Aug 2023",
+      "title": "Started Foundations of Modern Machine Learning at IIIT Hyderabad"
+    },
+    {
+      "datetime": "2023-07",
+      "date": "Jul 2023",
+      "title": "Created the portfolio repository",
+      "url": "https://github.com/Nitin-Sagar-B/nitin-sagar-b.github.io"
+    },
+    {
+      "datetime": "2023-05",
+      "date": "May 2023",
+      "title": "Started work on FlowScope",
+      "url": "https://github.com/Nitin-Sagar-B/flowscope"
+    },
+    {
+      "datetime": "2023-01",
+      "date": "Jan 2023",
+      "title": "Co-authored an article on AI in periodontics",
+      "url": "https://doi.org/10.47750/jptcp.2023.1100"
+    },
+    {
+      "datetime": "2021-12",
+      "date": "Dec 2021",
+      "title": "Started the BTech in AI and Data Science at BVRIT"
+    }
+  ],
+  "publications": [
+    {
+      "datetime": "2024-11-16",
+      "date": "Nov 16, 2024",
+      "title": "FlowScope: Enhancing Decision Making by Time Series Forecasting based on Prediction Optimization using HybridFlow Forecast Framework",
+      "organization": "arXiv preprint",
+      "summary": "Co-authored a preprint on combining statistical and neural forecasting approaches.",
+      "url": "https://arxiv.org/abs/2411.10716"
+    },
+    {
+      "datetime": "2023-01-25",
+      "date": "Jan 25, 2023",
+      "title": "Artificial Intelligence: A neoteric reach in Periodontics",
+      "organization": "Journal of Population Therapeutics and Clinical Pharmacology",
+      "summary": "Co-authored a review of AI applications in periodontal diagnosis and treatment planning.",
+      "url": "https://doi.org/10.47750/jptcp.2023.1100"
+    }
+  ],
+  "credentials": [
+    {
+      "datetime": "2026-11",
+      "date": "Nov 2026",
+      "title": "Agents and Workflows",
+      "organization": "OpenAI",
+      "url": "https://oaiacademy.credential.net/6957d340-911d-458f-8b60-9614647ff5de"
+    },
+    {
+      "datetime": "2026-11",
+      "date": "Nov 2026",
+      "title": "Applied AI Foundations",
+      "organization": "OpenAI",
+      "url": "https://oaiacademy.credential.net/5fe837ff-32f0-4b1b-a5e9-5d2b3c036d56"
+    },
+    {
+      "datetime": "2026-03",
+      "date": "Mar 2026",
+      "title": "Reinvention with Agentic AI",
+      "organization": "Accenture",
+      "url": "https://www.credly.com/badges/8d116ab5-9403-45ac-895f-7fc654f9fc78"
+    },
+    {
+      "datetime": "2025-08",
+      "date": "Aug 2025",
+      "title": "Prompt Engineering and Programming with OpenAI",
+      "organization": "Columbia University",
+      "url": "https://badges.plus.columbia.edu/e54935d1-2566-44a9-ac28-3f13796e2acd"
+    },
+    {
+      "datetime": "2025-08",
+      "date": "Aug 2025",
+      "title": "Inspect Rich Documents with Gemini & RAG",
+      "organization": "Google Cloud",
+      "url": "https://www.credential.net/5ef2673f-0038-48d1-a80e-5ac9dbac08ee"
+    },
+    {
+      "datetime": "2025-07",
+      "date": "Jul 2025",
+      "title": "Hugging Face Agents Course: Excellence",
+      "organization": "Hugging Face",
+      "url": "https://huggingface.co/datasets/agents-course/final-certificates/resolve/main/certificates/nit-sparky/2025-07-12.png"
+    },
+    {
+      "datetime": "2025",
+      "date": "2025",
+      "title": "Learn AI Agents",
+      "organization": "Coursera / Scrimba",
+      "url": "https://www.coursera.org/account/accomplishments/verify/VMCS6N3SGHCM"
+    }
+  ]
+}

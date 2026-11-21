@@ -1,63 +1,57 @@
-// AbstractOS Service Worker — Offline Cache Strategy
-const CACHE_NAME = 'abstractos-v4';
-const ASSETS_TO_CACHE = [
-    '/',
-    '/index.html',
-    '/styles.css',
-    '/scripts.js',
-    '/image.png',
-    '/icon-192.png',
-    '/icon-512.png',
-    '/manifest.json',
-    '/og-preview.png'
+const RELEASE = '5';
+const CACHE_PREFIX = 'abstractos-v';
+const CACHE_NAME = CACHE_PREFIX + RELEASE;
+const ASSETS = [
+    '/', '/index.html', '/styles.css?v=' + RELEASE, '/scripts.js?v=' + RELEASE,
+    '/image.png', '/icon-192.png', '/icon-512.png', '/manifest.json',
 ];
+const VERSIONED_ASSETS = new Set(ASSETS.filter(path => path.includes('?')));
 
-// Pre-cache critical assets on install
 self.addEventListener('install', event => {
-    event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then(cache => cache.addAll(ASSETS_TO_CACHE))
-            .then(() => self.skipWaiting())
-    );
+    event.waitUntil(caches.open(CACHE_NAME)
+        .then(cache => cache.addAll(ASSETS.map(path => new Request(new URL(path, location.origin), {
+            cache: 'reload',
+        }))))
+        .then(() => self.skipWaiting()));
 });
 
-// Clean old caches on activate
 self.addEventListener('activate', event => {
-    event.waitUntil(
-        caches.keys().then(keys =>
-            Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
-        ).then(() => self.clients.claim())
-    );
+    event.waitUntil(caches.keys()
+        .then(keys => Promise.all(keys
+            .filter(key => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME)
+            .map(key => caches.delete(key))))
+        .then(() => self.clients.claim()));
 });
 
-// Network-first for HTML, cache-first for static assets
-self.addEventListener('fetch', event => {
-    const url = new URL(event.request.url);
+async function fetchAndCache(cache, request) {
+    const response = await fetch(request);
+    if (response.ok) await cache.put(request, response.clone()).catch(() => {});
+    return response;
+}
 
-    // Skip non-GET and external requests
-    if (event.request.method !== 'GET' || url.origin !== location.origin) return;
-
-    // HTML — network first (always get latest), fallback to cache
-    if (event.request.headers.get('accept')?.includes('text/html')) {
-        event.respondWith(
-            fetch(event.request)
-                .then(response => {
-                    const clone = response.clone();
-                    caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-                    return response;
-                })
-                .catch(() => caches.match(event.request))
-        );
-        return;
+async function serve(request, url) {
+    const cache = await caches.open(CACHE_NAME);
+    const versioned = VERSIONED_ASSETS.has(url.pathname + url.search);
+    try {
+        if (versioned) {
+            const cached = await cache.match(request);
+            if (cached) return cached;
+        }
+        return await fetchAndCache(cache, request);
+    } catch (error) {
+        const cached = await cache.match(request);
+        if (cached) return cached;
+        if (request.mode === 'navigate' && (url.pathname === '/' || url.pathname === '/index.html')) {
+            const offlinePage = await cache.match('/');
+            if (offlinePage) return offlinePage;
+        }
+        throw error;
     }
+}
 
-    // Static assets — cache first, fallback to network
-    event.respondWith(
-        caches.match(event.request)
-            .then(cached => cached || fetch(event.request).then(response => {
-                const clone = response.clone();
-                caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-                return response;
-            }))
-    );
+self.addEventListener('fetch', event => {
+    const { request } = event;
+    const url = new URL(request.url);
+    if (request.method !== 'GET' || url.origin !== location.origin) return;
+    event.respondWith(serve(request, url));
 });
