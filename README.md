@@ -198,11 +198,18 @@ Grade: A | Covered k-NN, SVM, regression, clustering, PCA, neural networks, and 
 | Path | Purpose |
 | --- | --- |
 | `index.html` | Terminal interface and portfolio sections |
+| `profile/index.html` | Generated plain-text-friendly portfolio page |
+| `tools/build-profile.py` | Generates the profile and shared structured data from terminal content |
+| `robots.txt`, `sitemap.xml` | Crawl discovery |
 | `assets/css/` | Terminal styling |
 | `assets/js/` | Terminal interactions and server log |
 | `assets/images/` | Favicon and app icons |
 | `manifest.json`, `sw.js` | App manifest and offline cache |
 | `og-preview.png` | Social preview at its public URL |
+
+### Updating profile content
+
+Edit the portfolio sections in `index.html`, then run `python tools/build-profile.py` from the repository root. Commit the generated homepage JSON-LD and `profile/index.html` with the terminal edits. Run `python tools/build-profile.py --check` to check for stale output.
 
 ## Contact
 
