@@ -14,7 +14,7 @@ function loadWorker() {
   const url = path => new URL(path, origin).href;
   const oldCache = new Map([
     [url('/'), new Response('stale HTML')],
-    [url('/scripts.js'), new Response('stale script')],
+    [url('/scripts.js?v=5'), new Response('stale script')],
   ]);
   const storage = new Map([[oldCacheName, oldCache], ['unrelated-cache', new Map()]]);
   const listeners = new Map();
@@ -73,7 +73,7 @@ function loadWorker() {
 
 test('upgrades old caches and serves matching assets offline', async () => {
   assert.ok(release, 'The HTML should version its script URL.');
-  assert.ok(html.includes(`styles.css?v=${release}"`));
+  assert.ok(html.includes(`assets/css/styles.css?v=${release}"`));
   const worker = loadWorker();
   await worker.lifecycle('install');
   await worker.lifecycle('activate');
@@ -83,7 +83,7 @@ test('upgrades old caches and serves matching assets offline', async () => {
   assert.match(await page.text(), /^network/);
   worker.setOffline();
   assert.match(await (await worker.request('/?terminal=1')).text(), /^network|^asset/);
-  for (const path of [`/scripts.js?v=${release}`, `/styles.css?v=${release}`]) {
+  for (const path of [`/assets/js/scripts.js?v=${release}`, `/assets/css/styles.css?v=${release}`]) {
     assert.equal(await (await worker.request(path, 'same-origin')).text(), `asset ${path}`);
   }
 });

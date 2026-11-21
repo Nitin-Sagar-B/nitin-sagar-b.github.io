@@ -12,13 +12,25 @@ python -m http.server 8000 --bind 127.0.0.1
 
 Open [http://127.0.0.1:8000/](http://127.0.0.1:8000/). Use a fresh browser profile or unregister the service worker in DevTools when inspecting changes against an existing local cache.
 
+## Repository layout
+
+| Path | Purpose |
+| --- | --- |
+| `assets/` | Styles, browser JavaScript, and app icons |
+| `content/` | Portfolio content consumed by the HTML generator |
+| `tools/` | HTML generation script |
+| `tests/` | HTML, browser, and offline cache checks |
+| `.github/workflows/` | GitHub Actions checks |
+| `index.html`, `manifest.json`, `sw.js` | Public entry points for the site and its offline app |
+| `og-preview.png` | Social preview image at its existing public URL |
+
 ## Update content
 
-1. Edit `portfolio-content.json` for projects, experience, credentials, publications, and timeline milestones.
+1. Edit `content/portfolio-content.json` for projects, experience, credentials, publications, and timeline milestones.
 2. Use confirmed dates and direct links to the repository, publication, or credential. Describe shipped behavior and include a primary source for any measured result.
 3. Run `npm run build` and commit the content changes with the regenerated `index.html`. The site and terminal share the resulting markup.
 
-Use `styles.css` and `scripts.js` for presentation and terminal behavior. If either asset changes in a release, increment both URLs’ `v` query parameter in `index.html` and the matching `RELEASE` value in `sw.js`. This gives the updated page and worker matching cache keys.
+Use `assets/css/styles.css` and `assets/js/scripts.js` for presentation and terminal behavior. If either asset changes in a release, increment both URLs’ `v` query parameter in `index.html` and the matching `RELEASE` value in `sw.js`. This gives the updated page and worker matching cache keys.
 
 ## Check and release
 

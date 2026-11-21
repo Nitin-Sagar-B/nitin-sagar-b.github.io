@@ -2,8 +2,8 @@
   "name": "abstractos-portfolio",
   "private": true,
   "scripts": {
-    "build": "node build-content.mjs",
-    "check": "node build-content.mjs --check && python tests/check_html.py && node --test tests/service-worker.test.mjs",
+    "build": "node tools/build-content.mjs",
+    "check": "node tools/build-content.mjs --check && python tests/check_html.py && node --test tests/service-worker.test.mjs",
     "test": "node --test tests/local-browser.test.mjs",
     "test:http": "node --test tests/browser.test.mjs"
   },

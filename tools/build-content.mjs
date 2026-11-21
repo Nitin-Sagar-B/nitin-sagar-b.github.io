@@ -1,7 +1,7 @@
 import { readFile, writeFile } from 'node:fs/promises';
 
-const page = new URL('./index.html', import.meta.url);
-const data = JSON.parse(await readFile(new URL('./portfolio-content.json', import.meta.url), 'utf8'));
+const page = new URL('../index.html', import.meta.url);
+const data = JSON.parse(await readFile(new URL('../content/portfolio-content.json', import.meta.url), 'utf8'));
 const source = (await readFile(page, 'utf8')).replaceAll('\r\n', '\n');
 
 const entities = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
@@ -70,7 +70,7 @@ for (const [name, html] of Object.entries(regions)) {
 
 if (process.argv.includes('--check')) {
     if (output !== source) {
-        console.error('Portfolio content is out of date. Run node build-content.mjs.');
+        console.error('Portfolio content is out of date. Run npm run build.');
         process.exitCode = 1;
     }
 } else {
