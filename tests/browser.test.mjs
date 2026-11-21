@@ -49,8 +49,8 @@ async function evaluate(expression) {
   return result.result.value;
 }
 
-async function waitFor(probe, description) {
-  for (let attempt = 0; attempt < 100; attempt++) {
+async function waitFor(probe, description, attempts = 100) {
+  for (let attempt = 0; attempt < attempts; attempt++) {
     const result = await probe();
     if (result) return result;
     await delay(50);
@@ -66,7 +66,8 @@ async function navigate(path) {
 
 async function press(key, windowsVirtualKeyCode) {
   const event = { key, code: key, windowsVirtualKeyCode };
-  await command('Input.dispatchKeyEvent', { type: 'rawKeyDown', ...event });
+  const keyDown = key === 'Enter' ? { type: 'keyDown', text: '\r' } : { type: 'rawKeyDown' };
+  await command('Input.dispatchKeyEvent', { ...keyDown, ...event });
   await command('Input.dispatchKeyEvent', { type: 'keyUp', ...event });
 }
 
@@ -149,7 +150,7 @@ test('terminal boot is dismissible and reduced motion bypasses it', async () => 
   assert.equal(await evaluate(visibleBoot), true);
   assert.equal(await evaluate(`document.activeElement.id`), 'skip-intro');
   await press('Enter', 13);
-  assert.equal(await evaluate(visibleBoot), false);
+  await waitFor(() => evaluate(`!(${visibleBoot})`), 'keyboard dismissal', 20);
   assert.equal(await evaluate(`document.activeElement.id`), 'terminal-exit');
   assert.equal(await evaluate(`!!document.getElementById('tpl-2').content.querySelector('a[href*="receptionist"]')`), true);
   await evaluate(`sessionStorage.clear()`);
