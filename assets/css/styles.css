@@ -7,9 +7,10 @@
 
     --text-main: #C5C6C7;
     /* Silver/Off-White */
-    --text-muted: #6B6F7A;
+    --text-muted: #A0A3AE;
 
-    --accent-primary: #6667AB;
+    --accent-primary: #999AE0;
+    --accent-chrome: #6667AB;
     /* Pantone Very Peri - Soft Violet */
     --accent-secondary: #FFBE98;
     /* Pantone Peach Fuzz */
@@ -24,6 +25,29 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+:where(a, button, [tabindex]):focus-visible {
+    outline: 2px solid var(--accent-secondary);
+    outline-offset: 2px;
+}
+
+button {
+    font: inherit;
+    color: inherit;
+}
+
+#mobile-nav-toggle,
+#tel-toggle,
+#audio-toggle {
+    border: 0;
+    background: transparent;
+    padding: 3px 6px;
+    cursor: pointer;
 }
 
 /* ============================== */
@@ -42,6 +66,32 @@
     justify-content: center;
     font-family: 'JetBrains Mono', 'Courier New', monospace;
     transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+
+#skip-intro,
+#replay-intro,
+#next-chapter {
+    background: var(--bg-panel);
+    border: 1px solid var(--accent-chrome);
+    padding: 5px 10px;
+    min-height: 32px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#skip-intro {
+    margin-top: 16px;
+    color: var(--accent-secondary);
+}
+
+#next-chapter {
+    color: var(--success);
+}
+
+#skip-intro:hover,
+#replay-intro:hover,
+#next-chapter:hover {
+    border-color: var(--accent-secondary);
 }
 
 .boot-screen.fade-out {
@@ -234,6 +284,7 @@ body {
 /* SIDEBAR */
 .sidebar {
     width: 250px;
+    overflow-y: auto;
     background: var(--bg-sidebar);
     border-right: 1px solid var(--bg-panel);
     display: flex;
@@ -268,6 +319,43 @@ body {
     padding-left: 25px;
     margin-top: 5px;
     width: 100%;
+}
+
+.explorer-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px 8px;
+    padding: 6px 12px;
+    border-bottom: 1px solid var(--bg-panel);
+    font-size: 0.8rem;
+}
+
+.explorer-actions .quick-profile {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+    color: var(--accent-secondary);
+}
+
+.file-tree li:has(> a[data-index]) {
+    padding: 0;
+}
+
+.file-tree a[data-index] {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 6px 15px;
+    color: inherit;
+    text-decoration: none;
+}
+
+.file-tree a[data-index]:focus-visible,
+.tab:focus-visible {
+    outline-offset: -3px;
 }
 
 .file-tree li {
@@ -379,6 +467,7 @@ body {
 /* MAIN TERMINAL */
 .terminal-main {
     flex: 1;
+    min-width: 0;
     display: flex;
     flex-direction: column;
     background: var(--bg-dark);
@@ -391,6 +480,9 @@ body {
 }
 
 .tab {
+    border: 0;
+    border-top: 2px solid transparent;
+    cursor: pointer;
     padding: 0 20px;
     display: flex;
     align-items: center;
@@ -410,6 +502,8 @@ body {
 
 .terminal-viewport {
     flex: 1;
+    min-height: 0;
+    overflow-wrap: anywhere;
     padding: 30px;
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.95rem;
@@ -432,7 +526,7 @@ body {
     z-index: 2;
     background-size: 100% 2px, 3px 100%;
     pointer-events: none;
-    opacity: 0.4;
+    opacity: 0.23;
 }
 
 /* COMMAND LINE */
@@ -440,6 +534,8 @@ body {
     margin-top: 15px;
     display: flex;
     gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
     color: var(--text-main);
 }
 
@@ -478,6 +574,15 @@ body {
 }
 
 /* OUTPUT BLOCKS */
+.output-block.current-output {
+    min-height: var(--section-viewport-height, 65vh);
+}
+
+.output-block :is(h1, h2, h3)[tabindex="-1"]:focus {
+    outline: 2px solid var(--accent-secondary);
+    outline-offset: 2px;
+}
+
 #terminal-history {
     margin-bottom: 20px;
 }
@@ -660,7 +765,7 @@ body {
 /* FOOTER */
 .ide-footer {
     height: 30px;
-    background: var(--accent-primary);
+    background: var(--accent-chrome);
     color: #fff;
     display: flex;
     justify-content: space-between;
@@ -936,6 +1041,11 @@ body {
 
 /* Responsive adjustments */
 @media screen and (max-width: 800px) {
+    .ide-container,
+    .boot-screen,
+    .mobile-overlay {
+        height: 100dvh;
+    }
 
     /* Header layout changes */
     #mobile-nav-toggle {
@@ -949,13 +1059,29 @@ body {
         display: none !important;
     }
 
+    .ide-header,
+    .terminal-tabs {
+        min-height: 44px;
+        flex-shrink: 0;
+    }
+
+    #mobile-nav-toggle,
+    #tel-toggle,
+    #replay-intro,
+    #skip-intro,
+    #next-chapter,
+    .explorer-actions .quick-profile,
+    .file-tree a[data-index] {
+        min-height: 44px;
+    }
+
     /* Convert Explorer sidebar to an iOS Bottom Sheet */
     .sidebar {
         display: flex !important;
         position: fixed;
         left: 0;
         bottom: -100%;
-        /* Hidden below */
+        visibility: hidden;
         top: auto;
         width: 100%;
         height: 75vh;
@@ -964,11 +1090,12 @@ body {
         border-top: 2px solid var(--accent-primary);
         border-top-left-radius: 20px;
         border-top-right-radius: 20px;
-        transition: bottom 0.3s cubic-bezier(0.1, 0.8, 0.3, 1);
+        transition: bottom 0.3s cubic-bezier(0.1, 0.8, 0.3, 1), visibility 0.3s;
         box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.8);
     }
 
     .sidebar.mobile-open {
+        visibility: visible;
         bottom: 0;
         left: 0;
         /* Override old logic */
@@ -1023,45 +1150,21 @@ body {
         font-size: 0.95rem;
     }
 
-    /* Sticky Mobile Native Chat Prompt */
+    /* Keep the next command in the reading flow. */
     #terminal-viewport {
-        display: flex;
-        flex-direction: column;
-        padding: 15px 10px 20px 10px;
-        /* Adjusted padding to let sticky prompt behave naturally */
-        font-size: clamp(0.7rem, 2.8vw, 0.9rem);
-        position: relative;
+        padding: 15px 12px 20px;
+        font-size: 0.875rem;
     }
 
     #active-command-line {
-        position: sticky;
-        bottom: 15px;
-        /* Sticks to the bottom of the viewport gracefully */
-        margin-top: auto;
-        /* Chat App Style: Forces it to the bottom even if content is short */
-        padding: 12px 15px;
-        background: rgba(18, 18, 20, 0.95);
-        backdrop-filter: blur(15px);
-        -webkit-backdrop-filter: blur(15px);
-        z-index: 100;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 10px 12px;
+        background: var(--bg-sidebar);
+        border: 1px solid var(--bg-panel);
         border-radius: 8px;
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
     }
 
-    #ghost-text {
-        display: block !important;
-        flex-basis: 100%;
-        text-align: right;
-        font-size: 0.75rem;
-        color: var(--success);
-        /* Green positive affordance to tap */
-        margin-top: 8px;
-        opacity: 0.8 !important;
-        animation: pulse 1.5s infinite;
+    #active-command-line #ghost-text {
+        display: none;
     }
 
     /* Stacked Data Cards on Mobile */
@@ -1193,12 +1296,31 @@ body {
 
     /* Contact – prevent URL overflow */
     .bullet-list a.cert-link {
-        word-break: break-all;
-        font-size: 0.85rem;
+        display: inline-block;
+        max-width: 100%;
+        overflow-wrap: anywhere;
     }
 
     .bullet-list li {
         line-height: 1.5;
         margin-bottom: 10px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .boot-screen,
+    .boot-line,
+    .boot-cursor,
+    .boot-progress-fill,
+    .cursor,
+    .fa-spinner,
+    .lang-fill,
+    .output-block,
+    .ghost-text,
+    .sidebar,
+    .telemetry-sidebar,
+    .mobile-overlay {
+        animation: none !important;
+        transition: none !important;
     }
 }

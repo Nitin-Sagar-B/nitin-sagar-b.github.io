@@ -211,7 +211,7 @@
 
     <!-- FontAwesome for IDE Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/styles.css?v=8">
+    <link rel="stylesheet" href="assets/css/styles.css?v=9">
 
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
@@ -232,7 +232,8 @@
     </noscript>
 
     <!-- Boot Sequence Overlay -->
-    <div id="boot-screen" class="boot-screen">
+    <div id="boot-screen" class="boot-screen" role="dialog" aria-modal="true" aria-label="AbstractOS intro" hidden>
+        <button type="button" id="skip-intro" class="skip-intro">Skip intro</button>
         <div class="boot-content">
             <div class="boot-line" style="animation-delay: 0s;"><span class="boot-title">AbstractOS v2.0 — POST</span></div>
             <div class="boot-line" style="animation-delay: 0.1s;"><span class="boot-separator">────────────────────────────────────</span></div>
@@ -263,19 +264,18 @@
             <div class="window-controls">
                 <span></span><span></span><span></span>
             </div>
-            <div id="mobile-nav-toggle"
-                style="display:none; cursor:pointer; color:var(--accent-secondary); margin-left: 10px; font-weight:bold;">
-                <i class="fas fa-bars"></i> EXPLORER
-            </div>
+            <button type="button" id="mobile-nav-toggle" aria-expanded="false" aria-controls="portfolio-explorer" aria-label="Portfolio Explorer">
+                <i class="fas fa-bars" aria-hidden="true"></i> Explorer
+            </button>
             <div class="window-title">nitin-sagar-b — Agentic Copilot OS v2.0</div>
             <div class="window-status" style="display:flex; align-items:center; gap: 15px;">
-                <span id="tel-toggle"
+                <button type="button" id="tel-toggle" aria-label="System monitor" aria-controls="telemetry-sidebar" aria-expanded="false"
                     style="cursor:pointer; color: var(--accent-primary); transition: color 0.3s; font-size: 0.75rem;">[
-                    SYSCTL ] <i class="fas fa-desktop"></i></span>
-                <span id="audio-toggle"
+                    SYSCTL ] <i class="fas fa-desktop"></i></button>
+                <button type="button" id="audio-toggle" aria-label="Terminal audio" aria-pressed="false"
                     style="cursor:pointer; color: var(--text-muted); transition: color 0.3s; font-size: 0.75rem;">[
                     Audio: <span id="audio-status">OFF</span> ] <i class="fas fa-volume-mute"
-                        id="audio-icon"></i></span>
+                        id="audio-icon"></i></button>
                 <span><i class="fas fa-check-circle"></i> Sys.Ready</span>
             </div>
         </header>
@@ -283,60 +283,62 @@
         <div class="ide-body">
 
             <!-- Left Sidebar (Explorer) -->
-            <aside class="sidebar">
+            <aside class="sidebar" id="portfolio-explorer" aria-label="Portfolio Explorer">
                 <div class="sidebar-title">EXPLORER</div>
-                <div class="explorer-section">
+                <nav class="explorer-section" aria-label="Portfolio sections">
                     <div class="explorer-header"><i class="fas fa-chevron-down"></i> PORTFOLIO</div>
+                    <div class="explorer-actions">
+                        <a href="/profile/" class="cert-link quick-profile">Quick profile</a>
+                        <button type="button" id="replay-intro">Replay intro</button>
+                    </div>
                     <ul class="file-tree">
                         <!-- We map data-index to the scroll chunks (0 to N) -->
-                        <li class="folder active" data-index="0">
-                            <i class="fas fa-folder"></i> about
+                        <li class="folder active"><a href="#about" data-index="0" aria-current="location">
+                            <i class="fas fa-folder" aria-hidden="true"></i> about</a>
                         </li>
-                        <li class="folder" data-index="1">
-                            <i class="fas fa-folder"></i> skills
+                        <li class="folder"><a href="#skills" data-index="1">
+                            <i class="fas fa-folder" aria-hidden="true"></i> skills</a>
                         </li>
-                        <li class="folder" data-index="2">
-                            <i class="fas fa-folder"></i> projects
+                        <li class="folder"><a href="#projects" data-index="2">
+                            <i class="fas fa-folder" aria-hidden="true"></i> projects</a>
                         </li>
-                        <li class="folder" data-index="3">
-                            <i class="fas fa-folder"></i> experience
+                        <li class="folder"><a href="#experience" data-index="3">
+                            <i class="fas fa-folder" aria-hidden="true"></i> experience</a>
                         </li>
-                        <li class="folder" data-index="4">
-                            <i class="fas fa-folder"></i> certifications
+                        <li class="folder"><a href="#certifications" data-index="4">
+                            <i class="fas fa-folder" aria-hidden="true"></i> certifications</a>
                         </li>
-                        <li class="folder" data-index="5">
-                            <i class="fas fa-folder"></i> publications
+                        <li class="folder"><a href="#publications" data-index="5">
+                            <i class="fas fa-folder" aria-hidden="true"></i> publications</a>
                         </li>
-                        <li class="folder" data-index="6">
-                            <i class="fas fa-network-wired"></i> sparkience_ai
+                        <li class="folder"><a href="#sparkience-ai" data-index="6">
+                            <i class="fas fa-network-wired" aria-hidden="true"></i> sparkience_ai</a>
                         </li>
-                        <li class="folder" data-index="7">
-                            <i class="fas fa-folder-open"></i> misc
+                        <li class="folder">
+                            <i class="fas fa-folder-open" aria-hidden="true"></i> misc
                             <ul class="sub-tree">
-                                <li class="file" data-index="7"><i class="fas fa-file-alt"></i> education.md</li>
-                                <li class="file" data-index="8"><i class="fas fa-file-code"></i> languages.json</li>
-                                <li class="file" data-index="9"><i class="fas fa-file-alt"></i> interests.txt</li>
+                                <li class="file"><a href="#education" data-index="7"><i class="fas fa-file-alt" aria-hidden="true"></i> education.md</a></li>
+                                <li class="file"><a href="#languages" data-index="8"><i class="fas fa-file-code" aria-hidden="true"></i> languages.json</a></li>
+                                <li class="file"><a href="#interests" data-index="9"><i class="fas fa-file-alt" aria-hidden="true"></i> interests.txt</a></li>
                             </ul>
                         </li>
-                        <li class="folder" data-index="10">
-                            <i class="fas fa-address-book"></i> contact
+                        <li class="folder"><a href="#contact" data-index="10">
+                            <i class="fas fa-address-book" aria-hidden="true"></i> contact</a>
                         </li>
                     </ul>
-                    <a href="/profile/" class="cert-link" style="display:inline-block; margin: 8px 12px;">Plain HTML profile</a>
-                </div>
+
+                </nav>
             </aside>
 
             <!-- Main Terminal Area -->
             <main class="terminal-main">
-                <div class="terminal-tabs">
-                    <div class="tab active" id="tab-bash" style="cursor: pointer;"><i class="fas fa-terminal"></i> bash
-                    </div>
-                    <div class="tab" id="tab-server" style="cursor: pointer;"><i class="fas fa-server"></i> server.log
-                    </div>
+                <div class="terminal-tabs" role="tablist" aria-label="Terminal views">
+                    <button type="button" class="tab active" id="tab-bash" role="tab" aria-selected="true" aria-controls="terminal-viewport"><i class="fas fa-terminal" aria-hidden="true"></i> bash</button>
+                    <button type="button" class="tab" id="tab-server" role="tab" aria-selected="false" aria-controls="server-viewport" tabindex="-1"><i class="fas fa-server" aria-hidden="true"></i> server.log · Timeline</button>
                 </div>
 
                 <!-- BASH VIEWPORT -->
-                <div class="terminal-viewport" id="terminal-viewport">
+                <div class="terminal-viewport" id="terminal-viewport" role="tabpanel" aria-labelledby="tab-bash" tabindex="0">
 
                     <!-- Content will be injected here via JS -->
                     <div id="terminal-history"></div>
@@ -346,13 +348,15 @@
                         <span class="prompt"><span class="user">agent@abstractOS</span>:<span class="dir"
                                 id="prompt-dir">~/about</span>$</span>
                         <span id="typewriter"></span><span class="cursor"></span><span id="ghost-text"
-                            class="ghost-text"></span>
+                            class="ghost-text" aria-hidden="true"></span>
+                        <button type="button" id="next-chapter" hidden>Next section</button>
                     </div>
 
+                    <div id="section-scroll-spacer" aria-hidden="true"></div>
                 </div>
 
                 <!-- SERVER LOG VIEWPORT (Hidden by default) -->
-                <div class="terminal-viewport" id="server-viewport" style="display: none; padding-bottom: 50px;">
+                <div class="terminal-viewport" id="server-viewport" role="tabpanel" aria-labelledby="tab-server" tabindex="0" hidden>
                     <div id="server-log-stream">
                         <!-- Streamed timeline content goes here -->
                     </div>
@@ -806,7 +810,7 @@
     </template>
 
     <!-- GSAP removed: replaced with native Web Animations API in assets/js/scripts.js -->
-    <script src="assets/js/scripts.js?v=8"></script>
+    <script src="assets/js/scripts.js?v=9"></script>
 </body>
 
 </html>

@@ -11,27 +11,50 @@ if (!terminalHistory || !typewriterElement || !promptDir || !terminalViewport) {
 // ==========================================
 // BOOT SEQUENCE
 // ==========================================
-(function initBootSequence() {
-    const bootScreen = document.getElementById('boot-screen');
-    if (!bootScreen) return;
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+const narrowScreen = window.matchMedia('(max-width: 800px)');
+const sidebarItems = [...document.querySelectorAll('.sidebar a[data-index]')];
 
-    // Skip boot on return visits within the same session
-    if (sessionStorage.getItem('abstractos-booted')) {
-        bootScreen.remove();
-        return;
+function initBootSequence() {
+    const bootScreen = document.getElementById('boot-screen');
+    const skip = document.getElementById('skip-intro');
+    const replay = document.getElementById('replay-intro');
+    const terminal = document.querySelector('.ide-container');
+    let bootTimer;
+    let previousFocus;
+
+    function finishBoot() {
+        clearTimeout(bootTimer);
+        bootScreen.hidden = true;
+        terminal.inert = false;
+        const focusTarget = previousFocus?.isConnected ? previousFocus : tabBash;
+        focusTarget.focus({ preventScroll: true });
     }
 
-    // Total animation time: ~3.1s (last line at 2.1s + progress 0.9s + 0.1s buffer)
-    const BOOT_DURATION = 3200;
-    setTimeout(() => {
-        bootScreen.classList.add('fade-out');
-        sessionStorage.setItem('abstractos-booted', '1');
-        // Remove from DOM after fade completes
-        setTimeout(() => bootScreen.remove(), 600);
-    }, BOOT_DURATION);
-})();
+    function showBoot() {
+        previousFocus = document.activeElement === document.body ? null : document.activeElement;
+        terminal.inert = true;
+        bootScreen.hidden = false;
+        skip.focus();
+        bootTimer = setTimeout(finishBoot, 3200);
+    }
 
-const sidebarItems = document.querySelectorAll('.sidebar .folder, .sidebar .file');
+    skip.addEventListener('click', finishBoot);
+    bootScreen.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') finishBoot();
+        if (event.key === 'Tab') event.preventDefault();
+    });
+    replay.addEventListener('click', showBoot);
+
+    let seen = false;
+    try {
+        seen = sessionStorage.getItem('abstractos-booted') === '1';
+        sessionStorage.setItem('abstractos-booted', '1');
+    } catch {
+        // The intro still runs when storage is unavailable.
+    }
+    if (!seen && !location.hash && !reducedMotion.matches) showBoot();
+}
 
 // ==========================================
 // CYBER AUDIO ENGINE
@@ -126,6 +149,7 @@ const audioToggleBtn = document.getElementById('audio-toggle');
 if (audioToggleBtn) {
     audioToggleBtn.addEventListener('click', () => {
         const isNowOn = audioEngine.toggle();
+        audioToggleBtn.setAttribute('aria-pressed', String(isNowOn));
         document.getElementById('audio-status').textContent = isNowOn ? "ON" : "OFF";
         document.getElementById('audio-icon').className = isNowOn ? "fas fa-volume-up" : "fas fa-volume-mute";
         audioToggleBtn.style.color = isNowOn ? "var(--success)" : "var(--text-muted)";
@@ -138,66 +162,64 @@ const mobileOverlay = document.getElementById('mobile-overlay');
 const sidebarEl = document.querySelector('.sidebar');
 const mobileNavBtn = document.getElementById('mobile-nav-toggle');
 
-if (telToggleBtn && telSidebar) {
-    telToggleBtn.addEventListener('click', () => {
-        if (telSidebar.classList.contains('open')) {
-            telSidebar.style.display = 'none';
-            telSidebar.classList.remove('open');
-            telToggleBtn.style.color = 'var(--accent-primary)';
-            stopTelemetryLoop();
-            if (mobileOverlay && window.innerWidth <= 800) mobileOverlay.classList.remove('active');
-        } else {
-            telSidebar.style.display = '';
-            telSidebar.classList.add('open');
-            telToggleBtn.style.color = 'var(--success)';
-            startTelemetryLoop();
-
-            // On mobile, show overlay and block the other sheet
-            if (window.innerWidth <= 800) {
-                if (mobileOverlay) mobileOverlay.classList.add('active');
-                if (sidebarEl && sidebarEl.classList.contains('mobile-open')) {
-                    sidebarEl.classList.remove('mobile-open');
-                }
-            }
-        }
-    });
+function setTelemetry(open) {
+    telSidebar.style.display = open ? '' : 'none';
+    telSidebar.classList.toggle('open', open);
+    telSidebar.inert = !open;
+    telToggleBtn.setAttribute('aria-expanded', String(open));
+    telToggleBtn.style.color = open ? 'var(--success)' : 'var(--accent-primary)';
+    if (open) startTelemetryLoop();
+    else stopTelemetryLoop();
+    updateMobileOverlay();
 }
 
-// Mobile Nav Toggle
-if (mobileNavBtn && sidebarEl) {
-    mobileNavBtn.addEventListener('click', () => {
-        const isOpening = !sidebarEl.classList.contains('mobile-open');
-        sidebarEl.classList.toggle('mobile-open');
-
-        if (window.innerWidth <= 800 && mobileOverlay) {
-            if (isOpening) {
-                mobileOverlay.classList.add('active');
-                // Close telemetry sheet if open
-                if (telSidebar && telSidebar.classList.contains('open')) {
-                    telSidebar.style.display = 'none';
-                    telSidebar.classList.remove('open');
-                    if (telToggleBtn) telToggleBtn.style.color = 'var(--accent-primary)';
-                }
-            } else {
-                mobileOverlay.classList.remove('active');
-            }
-        }
-    });
+function setExplorer(open, restoreFocus = false) {
+    sidebarEl.classList.toggle('mobile-open', open);
+    sidebarEl.inert = narrowScreen.matches && !open;
+    mobileNavBtn.setAttribute('aria-expanded', String(open));
+    updateMobileOverlay();
+    if (restoreFocus) mobileNavBtn.focus({ preventScroll: true });
 }
 
-// Close bottom sheets when clicking the overlay
-if (mobileOverlay) {
-    mobileOverlay.addEventListener('click', () => {
-        mobileOverlay.classList.remove('active');
-        if (sidebarEl) sidebarEl.classList.remove('mobile-open');
-        if (telSidebar && telSidebar.classList.contains('open')) {
-            telSidebar.style.display = 'none';
-            telSidebar.classList.remove('open');
-            if (telToggleBtn) telToggleBtn.style.color = 'var(--accent-primary)';
-        }
-    });
+function updateMobileOverlay() {
+    const covered = narrowScreen.matches &&
+        (sidebarEl.classList.contains('mobile-open') || telSidebar.classList.contains('open'));
+    terminalMain.inert = covered;
+    mobileOverlay.classList.toggle('active', covered);
 }
 
+telSidebar.inert = true;
+sidebarEl.inert = narrowScreen.matches;
+narrowScreen.addEventListener('change', () => {
+    if (narrowScreen.matches && sidebarEl.contains(document.activeElement)) mobileNavBtn.focus();
+    setExplorer(false);
+});
+
+telToggleBtn.addEventListener('click', () => {
+    const open = !telSidebar.classList.contains('open');
+    if (open && narrowScreen.matches) setExplorer(false);
+    setTelemetry(open);
+});
+
+mobileNavBtn.addEventListener('click', () => {
+    const open = !sidebarEl.classList.contains('mobile-open');
+    if (open) setTelemetry(false);
+    setExplorer(open);
+    if (open) sidebarEl.querySelector('.quick-profile').focus({ preventScroll: true });
+});
+
+function closeMobileSheets() {
+    if (sidebarEl.classList.contains('mobile-open')) setExplorer(false, true);
+    if (narrowScreen.matches && telSidebar.classList.contains('open')) {
+        setTelemetry(false);
+        telToggleBtn.focus({ preventScroll: true });
+    }
+}
+
+mobileOverlay.addEventListener('click', closeMobileSheets);
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeMobileSheets();
+});
 
 // Define the chapters that occur sequentially as we scroll
 const chapters = [
@@ -215,144 +237,143 @@ const chapters = [
 ];
 
 const totalChapters = chapters.length;
+const nextChapter = document.getElementById('next-chapter');
+const ghostEl = document.getElementById('ghost-text');
+const sectionScrollSpacer = document.getElementById('section-scroll-spacer');
 let currentChapter = -1;
 let isTyping = false;
 let typeInterval;
 let scrollHintTimeout;
+let renderToken = 0;
 
-// Ghost text element
-const ghostTextElement = document.createElement('span');
-ghostTextElement.className = 'ghost-text';
-let ghostEl;
+function sectionIndex(hash) {
+    return Number(sidebarItems.find(item => item.hash === hash)?.dataset.index ?? 0);
+}
 
-// Handle Scroll Event to determine active chapter
-window.addEventListener('scroll', () => {
-    // We have 1000vh total. So each chapter gets exactly 100vh of scroll space.
-    const scrollPos = window.scrollY;
-    const windowHeight = window.innerHeight;
+function currentLocation() {
+    return tabServer.getAttribute('aria-selected') === 'true' ? '#timeline' : sidebarItems[currentChapter]?.hash;
+}
 
-    // Calculate fractional progress and snap to chapter index
-    let newChapter = Math.floor(scrollPos / windowHeight);
+function recordNavigation(hash) {
+    const current = currentLocation();
+    const previous = location.hash || '#about';
+    if (hash === current && hash === previous) return;
+    if (current && current !== previous) history.replaceState(null, '', current);
+    if (hash !== (location.hash || '#about')) history.pushState(null, '', hash);
+}
 
-    // Edge case if we pull past max height
-    if (newChapter >= totalChapters) newChapter = totalChapters - 1;
-    if (newChapter < 0) newChapter = 0;
+function jumpToSection(index, { record = false, focus = false } = {}) {
+    if (record) recordNavigation(sidebarItems[index].hash);
+    selectTerminalTab(tabBash);
+    window.scrollTo({ top: index * window.innerHeight, behavior: 'instant' });
+    changeChapter(index, { instant: true, focus });
+}
 
-    if (newChapter !== currentChapter) {
-        changeChapter(newChapter);
+function openTimeline({ record = false, focus = false } = {}) {
+    if (record) recordNavigation('#timeline');
+    selectTerminalTab(tabServer);
+    if (focus) serverViewport.focus({ preventScroll: true });
+}
+
+function readLocation() {
+    if (location.hash === '#timeline') {
+        openTimeline();
+    } else {
+        const index = sectionIndex(location.hash);
+        if (currentChapter !== index || tabServer.getAttribute('aria-selected') === 'true') jumpToSection(index);
     }
+}
+
+history.scrollRestoration = 'manual';
+window.addEventListener('popstate', readLocation);
+window.addEventListener('hashchange', readLocation);
+window.addEventListener('resize', () => {
+    if (currentChapter < 0 || tabServer.getAttribute('aria-selected') === 'true') return;
+    const currentOutput = terminalHistory.querySelector('.current-output');
+    if (currentOutput) fitSectionScroll(currentOutput.querySelector('h1, h2, h3') || currentOutput);
+    window.scrollTo({ top: currentChapter * window.innerHeight, behavior: 'instant' });
 });
 
-function changeChapter(index) {
-    if (isTyping) {
-        clearInterval(typeInterval);
-        isTyping = false;
-    }
+window.addEventListener('scroll', () => {
+    if (tabServer.getAttribute('aria-selected') === 'true') return;
+    const index = Math.min(totalChapters - 1, Math.max(0, Math.floor(window.scrollY / window.innerHeight)));
+    if (index !== currentChapter) changeChapter(index, { instant: reducedMotion.matches });
+});
 
+function changeChapter(index, { instant = false, focus = false } = {}) {
+    clearInterval(typeInterval);
+    clearTimeout(scrollHintTimeout);
+    isTyping = false;
+    renderToken++;
     currentChapter = index;
 
     updateSidebarUI(index);
+    nextChapter.hidden = true;
+    sectionScrollSpacer.style.height = '0px';
+    ghostEl.textContent = '';
+    typewriterElement.textContent = '';
+    promptDir.textContent = chapters[index].dir;
     renderInstantHistory(index);
-    startTypingCommand(index);
+
+    if (instant) {
+        terminalHistory.insertAdjacentHTML('beforeend', commandMarkup(chapters[index]));
+        executeCommandFinal(index, renderToken, { instant, focus });
+    } else {
+        scrollToBottom();
+        startTypingCommand(index);
+    }
 }
 
-// Ensure the sidebar styling updates
 function updateSidebarUI(index) {
-    sidebarItems.forEach(item => item.classList.remove('active'));
-    // Find the item matching this index
-    const activeItem = document.querySelector(`.sidebar [data-index="${index}"]`);
-    if (activeItem) {
-        activeItem.classList.add('active');
-        // if it's a file, ensure parent folder is seemingly open
-        if (activeItem.classList.contains('file')) {
-            activeItem.parentElement.parentElement.classList.add('active');
-        }
-    }
+    sidebarItems.forEach((item, i) => {
+        item.parentElement.classList.toggle('active', i === index);
+        if (i === index) item.setAttribute('aria-current', 'location');
+        else item.removeAttribute('aria-current');
+    });
+    const subTree = sidebarItems[index].closest('.sub-tree');
+    document.querySelector('.sub-tree').parentElement.classList.toggle('active', !!subTree);
 }
 
-// Automatically jump scroll depth if sidebar item is clicked
-sidebarItems.forEach(item => {
-    item.addEventListener('click', (e) => {
-        e.stopPropagation(); // prevent bubbling to parent folder if clicking a file
-        const index = parseInt(item.getAttribute('data-index'));
-        const targetScroll = index * window.innerHeight;
-        window.scrollTo({
-            top: targetScroll,
-            behavior: 'smooth'
-        });
-
-        // Hide sidebar automatically on mobile
-        if (window.innerWidth <= 800) {
-            if (sidebarEl) sidebarEl.classList.remove('mobile-open');
-            if (mobileOverlay) mobileOverlay.classList.remove('active');
-        }
+sidebarItems.forEach((item, i) => {
+    item.addEventListener('click', (event) => {
+        if (event.button !== 0 || event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return;
+        event.preventDefault();
+        setExplorer(false);
+        jumpToSection(i, { record: true, focus: true });
     });
 });
 
-// Add Enter key to execute next command
-window.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-        e.preventDefault();
-        if (isTyping) return; // Prevent skipping ahead while the agent is actively typing/thinking
-
-        const nextIndex = currentChapter + 1;
-        if (nextIndex < totalChapters) {
-            const targetScroll = nextIndex * window.innerHeight;
-            window.scrollTo({
-                top: targetScroll,
-                behavior: 'smooth'
-            });
-        }
+function advanceChapter() {
+    if (isTyping || nextChapter.hidden) return;
+    if (currentChapter + 1 < totalChapters) {
+        jumpToSection(currentChapter + 1, { record: true, focus: true });
     }
+}
+nextChapter.addEventListener('click', advanceChapter);
+window.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' || event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey ||
+        tabServer.getAttribute('aria-selected') === 'true' ||
+        (event.target !== document.body && event.target !== terminalViewport)) return;
+    advanceChapter();
 });
 
-// Terminal Viewport Mobile Tap to Advance
-if (terminalViewport) {
-    terminalViewport.addEventListener('click', (e) => {
-        // Only trigger on mobile to avoid preventing desktop text selection logic
-        if (window.innerWidth > 800) return;
-
-        // Ignore clicks on links or specific interactive chunks
-        if (e.target.tagName.toLowerCase() === 'a' ||
-            e.target.closest('.tab') ||
-            e.target.closest('.ide-header') ||
-            e.target.closest('.mobile-overlay')) return;
-
-        if (isTyping) return;
-
-        const nextIndex = currentChapter + 1;
-        if (nextIndex < totalChapters) {
-            window.scrollTo({
-                top: nextIndex * window.innerHeight,
-                behavior: 'smooth'
-            });
-        }
-    });
+function commandMarkup(chapter) {
+    return `<div class="command-line" style="margin-bottom: 10px; margin-top:15px;">
+        <span class="prompt"><span class="user">agent@abstractOS</span>:<span class="dir">${chapter.dir}</span>$</span>
+        <span>${chapter.cmd}</span>
+    </div>`;
 }
 
-// Render everything before the current chapter INSTANTLY to simulate history
 function renderInstantHistory(targetIndex) {
-    terminalHistory.innerHTML = ''; // Wipe clean
-
-    for (let i = 0; i < targetIndex; i++) {
-        const c = chapters[i];
-        const cmdHTML = `
-            <div class="command-line" style="margin-bottom: 10px; margin-top:15px;">
-                <span class="prompt"><span class="user">agent@abstractOS</span>:<span class="dir">${c.dir}</span>$</span>
-                <span>${c.cmd}</span>
-            </div>
-        `;
-        const outputTemplate = document.getElementById(c.tpl);
-        if (outputTemplate) {
-            terminalHistory.innerHTML += cmdHTML + outputTemplate.innerHTML;
-        }
-    }
-    scrollToBottom();
+    terminalHistory.innerHTML = chapters.slice(0, targetIndex)
+        .map(chapter => commandMarkup(chapter) + document.getElementById(chapter.tpl).innerHTML)
+        .join('');
 }
 
 // Start typing the active command
 function startTypingCommand(index) {
     const c = chapters[index];
+    const token = renderToken;
     typewriterElement.textContent = '';
     promptDir.textContent = c.dir;
 
@@ -374,15 +395,15 @@ function startTypingCommand(index) {
 
             // Wait 200ms before "pressing enter" and simulating the Agent Thinking steps
             setTimeout(() => {
-                executeThinkingSteps(index, c);
+                executeThinkingSteps(index, c, token);
             }, 200);
         }
     }, 30); // Faster typed speed for snappier feel
 }
 
 // Simulate Agent Thinking
-function executeThinkingSteps(index, c) {
-    if (currentChapter !== index) return;
+function executeThinkingSteps(index, c, token) {
+    if (token !== renderToken) return;
 
     // Commit the typed command into the history so the active line moves down
     const cmdHTML = `
@@ -431,7 +452,7 @@ function executeThinkingSteps(index, c) {
 
     stepsToRun.forEach((stepText, i) => {
         setTimeout(() => {
-            if (currentChapter !== index) return; // abort if scrolled away
+            if (token !== renderToken) return; // abort if scrolled away
             // Add a spinner for the active step
             const stepEl = document.createElement('div');
             stepEl.className = 'sys-out';
@@ -441,7 +462,7 @@ function executeThinkingSteps(index, c) {
 
             // If it's not the last step, we change the spinner to a checkmark after it "completes"
             setTimeout(() => {
-                if (stepEl && currentChapter === index) {
+                if (token === renderToken) {
                     stepEl.innerHTML = `<i class="fas fa-check" style="color:var(--success); margin-right:8px;"></i> ${stepText}`;
                     audioEngine.playBeep(); // Beep on completion
                 }
@@ -453,84 +474,73 @@ function executeThinkingSteps(index, c) {
 
     // After all thinking is done, dump the actual template
     setTimeout(() => {
-        if (currentChapter !== index) return;
-        executeCommandFinal(index);
+        if (token !== renderToken) return;
+        executeCommandFinal(index, token);
     }, stepDelay + 200);
 }
 
-function executeCommandFinal(index) {
-    if (currentChapter !== index) return;
+function executeCommandFinal(index, token, { instant = false, focus = false } = {}) {
+    if (token !== renderToken) return;
 
-    const c = chapters[index];
-    const outputTemplate = document.getElementById(c.tpl);
-
-    if (outputTemplate) {
-        // We clone and stagger children for nice animation
-        terminalHistory.insertAdjacentHTML('beforeend', outputTemplate.innerHTML);
-
-        // Add staggered animation strictly to the newly added block (native Web Animations API)
-        const newBlock = terminalHistory.lastElementChild;
-        if (newBlock && newBlock.classList.contains('output-block')) {
-            Array.from(newBlock.children).forEach((child, i) => {
-                child.animate(
-                    [{ opacity: 0, transform: 'translateY(15px)' }, { opacity: 1, transform: 'translateY(0)' }],
-                    { duration: 400, delay: i * 100, easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)', fill: 'forwards' }
-                );
-                child.style.opacity = '0'; // start hidden, animation fills forwards
-            });
+    const chapter = chapters[index];
+    terminalHistory.insertAdjacentHTML('beforeend', document.getElementById(chapter.tpl).innerHTML);
+    const content = terminalHistory.lastElementChild;
+    const heading = content.querySelector('h1, h2, h3') || content;
+    content.id = sidebarItems[index].hash.slice(1);
+    if (instant) {
+        content.classList.add('current-output');
+        showNextChapter(index);
+        terminalViewport.scrollTo({ top: fitSectionScroll(heading), behavior: 'instant' });
+        if (focus) {
+            heading.tabIndex = -1;
+            heading.focus({ preventScroll: true });
         }
-
-        // Pin header to top gracefully
-        const activeCmds = terminalHistory.querySelectorAll('.command-line');
-        if (activeCmds.length > 0) {
-            const lastCmd = activeCmds[activeCmds.length - 1];
-            setTimeout(() => {
-                lastCmd.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 50);
-        } else {
-            scrollToBottom();
-        }
+    } else {
+        Array.from(content.children).forEach((child, i) => {
+            child.animate(
+                [{ opacity: 0, transform: 'translateY(15px)' }, { opacity: 1, transform: 'translateY(0)' }],
+                { duration: 400, delay: i * 100, easing: 'ease-out', fill: 'backwards' }
+            );
+        });
+        const commands = terminalHistory.querySelectorAll('.command-line');
+        const last = commands[commands.length - 1];
+        const top = last.getBoundingClientRect().top - terminalViewport.getBoundingClientRect().top;
+        terminalViewport.scrollTo({ top: terminalViewport.scrollTop + top - 12, behavior: 'smooth' });
     }
 
-    // Setup ghost text for NEXT command
-    clearTimeout(scrollHintTimeout);
-    scrollHintTimeout = setTimeout(() => {
-        if (index + 1 < totalChapters) {
-            const nextC = chapters[index + 1];
-            promptDir.textContent = nextC.dir;
-            if (!ghostEl) {
-                ghostEl = document.getElementById('ghost-text');
-            }
-            if (ghostEl) {
-                if (window.innerWidth <= 800) {
-                    ghostEl.textContent = `[TAP / Scroll]`;
-                } else {
-                    ghostEl.textContent = `[Press Enter or Scroll to execute: ${nextC.cmd}]`;
-                }
-                ghostEl.style.opacity = '1';
-            }
-        }
-    }, 800); // Wait almost a second before showing hint
+    if (!instant) {
+        scrollHintTimeout = setTimeout(() => {
+            if (token === renderToken) showNextChapter(index);
+        }, 800);
+    }
+}
+
+function fitSectionScroll(heading) {
+    const top = terminalViewport.scrollTop +
+        heading.getBoundingClientRect().top - terminalViewport.getBoundingClientRect().top - 12;
+    sectionScrollSpacer.style.height = '0px';
+    const missing = top + terminalViewport.clientHeight - terminalViewport.scrollHeight;
+    sectionScrollSpacer.style.height = `${Math.max(0, Math.ceil(missing))}px`;
+    return top;
+}
+
+function showNextChapter(index) {
+    if (index + 1 >= totalChapters) return;
+    const next = chapters[index + 1];
+    promptDir.textContent = next.dir;
+    nextChapter.textContent = `Next: ${sidebarItems[index + 1].textContent.trim()}`;
+    nextChapter.hidden = false;
+    ghostEl.textContent = `[Press Enter or scroll to execute: ${next.cmd}]`;
+    ghostEl.style.opacity = '1';
 }
 
 function scrollToBottom() {
-    // We add a tiny delay for DOM painting
+    const token = renderToken;
     setTimeout(() => {
-        terminalViewport.scrollTo({
-            top: terminalViewport.scrollHeight,
-            behavior: 'smooth'
-        });
+        if (token !== renderToken) return;
+        terminalViewport.scrollTo({ top: terminalViewport.scrollHeight, behavior: 'smooth' });
     }, 50);
 }
-
-// Initial Boot (Force trigger the 0 state if we open the page)
-// A tiny delay ensures the CSS and heights are properly loaded before querying
-setTimeout(() => {
-    const scrollPos = window.scrollY;
-    let initialChapter = Math.floor(scrollPos / window.innerHeight);
-    if (initialChapter > totalChapters - 1) initialChapter = totalChapters - 1;
-    changeChapter(initialChapter);
-}, 100);
 
 // ==========================================
 // TELEMETRY SIMULATION LOOP
@@ -658,26 +668,44 @@ const masterTimeline = [
 
 let serverLogRendered = false;
 
-if (tabBash && tabServer) {
-    tabBash.addEventListener('click', () => {
-        tabBash.classList.add('active');
-        tabServer.classList.remove('active');
-        bashViewport.style.display = 'block';
-        serverViewport.style.display = 'none';
+const terminalTabs = [tabBash, tabServer];
+const tabList = tabBash.parentElement;
+function selectTerminalTab(selected) {
+    terminalTabs.forEach((tab) => {
+        const active = tab === selected;
+        tab.classList.toggle('active', active);
+        tab.setAttribute('aria-selected', String(active));
+        tab.tabIndex = active ? 0 : -1;
     });
-
-    tabServer.addEventListener('click', () => {
-        tabServer.classList.add('active');
-        tabBash.classList.remove('active');
-        serverViewport.style.display = 'block';
-        bashViewport.style.display = 'none';
-
-        if (!serverLogRendered) {
-            renderServerLogStatic();
-            serverLogRendered = true;
-        }
-    });
+    bashViewport.hidden = selected !== tabBash;
+    serverViewport.hidden = selected !== tabServer;
+    if (!serverViewport.hidden && !serverLogRendered) {
+        renderServerLogStatic();
+        serverLogRendered = true;
+    }
 }
+
+tabBash.addEventListener('click', () => {
+    if (tabBash.getAttribute('aria-selected') !== 'true') jumpToSection(Math.max(0, currentChapter), { record: true });
+});
+tabServer.addEventListener('click', () => {
+    if (tabServer.getAttribute('aria-selected') !== 'true') openTimeline({ record: true });
+});
+terminalTabs.forEach((tab, index) => {
+    tab.addEventListener('keydown', (event) => {
+        const order = { Home: 0, End: 1, ArrowLeft: 1 - index, ArrowRight: 1 - index };
+        if (!Object.hasOwn(order, event.key)) return;
+        event.preventDefault();
+        const next = terminalTabs[order[event.key]];
+        tab.tabIndex = -1;
+        next.tabIndex = 0;
+        next.focus();
+    });
+});
+tabList.addEventListener('focusout', (event) => {
+    if (tabList.contains(event.relatedTarget)) return;
+    terminalTabs.forEach(tab => { tab.tabIndex = tab.getAttribute('aria-selected') === 'true' ? 0 : -1; });
+});
 
 function renderServerLogStatic() {
     serverLogStream.innerHTML = '';
@@ -776,6 +804,15 @@ function appendLogEntry(time, type, message, isFiller) {
         greetingEl.textContent = greeting;
     }
 })();
+
+// Render the home section promptly, then preserve the animated scroll tour.
+if (location.hash === '#timeline') {
+    changeChapter(0, { instant: true });
+    openTimeline();
+} else {
+    jumpToSection(sectionIndex(location.hash));
+}
+initBootSequence();
 
 // ==========================================
 // PWA SERVICE WORKER REGISTRATION

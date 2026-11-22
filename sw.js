@@ -1,4 +1,4 @@
-const RELEASE = '8';
+const RELEASE = '9';
 const CACHE_PREFIX = 'abstractos-v';
 const CACHE_NAME = CACHE_PREFIX + RELEASE;
 const ASSETS = [
